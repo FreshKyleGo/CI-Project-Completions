@@ -260,6 +260,8 @@ function App() {
         const issueId = g(r, jCol.issueId);
         if (!issueId || String(issueId).trim() === '') continue;
         const status = String(g(r, jCol.status) || '').trim().toLowerCase();
+        const dept = String(g(r, jCol.dept) || '').trim();
+        if (!dept || dept === '' || dept.toLowerCase() === 'hr software support') continue;
         if (!RESOLVED_STATUSES.includes(status)) continue;
 
         const effSav = parseFloat(g(r, jCol.effectiveSavings) || 0);
@@ -272,7 +274,7 @@ function App() {
           issueKey: g(r, jCol.issueKey) || '—',
           summary: g(r, jCol.summary) || 'Untitled',
           reporter: g(r, jCol.reporter) || 'Unknown',
-          dept: g(r, jCol.dept) || '—',
+          dept: dept,
           description: g(r, jCol.description) || '',
           solution: g(r, jCol.solution) || '',
           effectiveSavings: effSav,
