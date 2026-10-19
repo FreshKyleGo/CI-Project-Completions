@@ -332,6 +332,19 @@ function App() {
   useEffect(() => {
     fetchCsv(DEFAULT_CSV_URL).then(rows => {
       if (!rows || rows.length < 2) return;
+      // Find the two numeric columns by header name, falling back to the known positions
+      const hdr = rows[0].map(h => String(h || '').toLowerCase());
+      const colByName = (name, fallback) => {
+        const i = hdr.findIndex(h => h.includes(name));
+        return i >= 0 ? i : fallback;
+      };
+      const effIdx = colByName('effective savings', jCol.effectiveSavings);
+      const totIdx = colByName('total count', jCol.totalCount);
+      // Strip thousands separators, units and spaces before reading the number
+      const toNum = v => {
+        const n = parseFloat(String(v == null ? '' : v).replace(/[^0-9.\-]/g, ''));
+        return isNaN(n) ? 0 : n;
+      };
       const data = [];
       for (let i = 1; i < rows.length; i++) {
         const r = rows[i];
@@ -344,8 +357,8 @@ function App() {
         const summaryRaw = String(g(r, jCol.summary) || '');
         const summaryLower = summaryRaw.toLowerCase();
         const isConfidential = EXCLUDED_SUMMARY_KEYWORDS.some(kw => summaryLower.includes(kw));
-        const effSav = parseFloat(g(r, jCol.effectiveSavings) || 0);
-        const totCount = parseFloat(g(r, jCol.totalCount) || 0);
+        const effSav = toNum(g(r, effIdx));
+        const totCount = toNum(g(r, totIdx));
         const startDate = parseDateSafe(g(r, jCol.startDate)) || parseDateSafe(g(r, jCol.created));
         const endDate = parseDateSafe(g(r, jCol.actualEnd));
         data.push({
