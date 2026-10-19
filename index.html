@@ -253,7 +253,7 @@ function App() {
           totalCount: totCount,
           startDate,
           endDate,
-          year: startDate ? startDate.getFullYear() : null,
+          year: endDate ? endDate.getFullYear() : (startDate ? startDate.getFullYear() : null),
           confidential: isConfidential,
         });
       }
